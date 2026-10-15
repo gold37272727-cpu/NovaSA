@@ -370,30 +370,56 @@
       loadMessages();
       poller = setInterval(loadMessages, 3000);
     }
+    
+async function createRoom() {
+  const roomName = $("createName").value.trim();
+  const password = $("createPassword").value;
 
-    async function createRoom() {
-      const roomName = $("createName").value.trim();
-      const password = $("createPassword").value;
+  if (!roomName) {
+    showStatus("Please enter a room name.");
+    return;
+  }
 
-      if (!roomName) {
-        showStatus("Please enter a room name.");
-        return;
-      }
+  if (password.length < 6 || password.length > 128) {
+    showStatus("Password must be 6–128 characters.");
+    return;
+  }
 
-      if (password.length < 6 || password.length > 128) {
-        showStatus("Password must be 6–128 characters.");
-        return;
-      }
+  const button = $("createBtn");
+  setBusy(button, true, "Creating...");
 
-      const button = $("createBtn");
-      setBusy(button, true, "Creating...");
+  try {
+    const result = await api({
+      action: "create",
+      roomName: roomName,
+      password: password
+    });
 
-      try {
-        const result = await api({
-          action: "create",
-          roomName: roomName,
-          password: password
-        });
+    const roomId = result.roomId || result.room_id;
+
+    // FIX: Backend may return ok:true instead of success:true
+    if (!(result.ok || result.success) || !roomId || !result.token) {
+      throw new Error(
+        result.error || "Room creation response is incomplete."
+      );
+    }
+
+    $("createPassword").value = "";
+
+    showChat(
+      roomId,
+      result.roomName || roomName,
+      result.token
+    );
+  } catch (error) {
+    console.error(error);
+    showStatus("Create failed: " + error.message);
+  } finally {
+    setBusy(button, false, "Create Room");
+  }
+}
+
+    
 
         const roomId = result.roomId || result.room_id;
 
