@@ -1,0 +1,876 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1020">
+  <title>NovaChat</title>
+
+  <style>
+    :root {
+      --bg: #080d19;
+      --panel: #111a2d;
+      --panel2: #17233a;
+      --border: #293752;
+      --text: #f3f6ff;
+      --muted: #a7b3ca;
+      --accent: #7c83ff;
+      --accent2: #5c65ed;
+      --danger: #ff6b7a;
+      --success: #65ddb0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at top, #18264a 0%, var(--bg) 58%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    button, input {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      border-radius: 11px;
+      padding: 12px 15px;
+      cursor: pointer;
+      font-weight: 650;
+      transition: opacity .15s;
+    }
+
+    button:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .primary:active {
+      background: var(--accent2);
+    }
+
+    .secondary {
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .danger {
+      background: #47212e;
+      color: #ffdce1;
+      border: 1px solid #713346;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 760px;
+      margin: auto;
+      padding: 22px 15px 35px;
+    }
+
+    header {
+      text-align: center;
+      padding: 15px 0 23px;
+    }
+
+    .logo {
+      width: 62px;
+      height: 62px;
+      margin: 0 auto 12px;
+      display: grid;
+      place-items: center;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #858bff, #5158d8);
+      box-shadow: 0 8px 35px #646cff35;
+      font-size: 29px;
+      font-weight: 800;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 30px;
+      letter-spacing: -.8px;
+    }
+
+    header p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .card {
+      background: #111a2deF;
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      padding: 18px;
+      margin-bottom: 15px;
+      box-shadow: 0 12px 35px #00000016;
+    }
+
+    h2 {
+      font-size: 17px;
+      margin: 0 0 15px;
+    }
+
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin: 12px 0 7px;
+    }
+
+    input {
+      width: 100%;
+      min-width: 0;
+      background: #0b1324;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 13px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+    }
+
+    .field-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .field-row input {
+      flex: 1;
+    }
+
+    .field-row button {
+      flex-shrink: 0;
+    }
+
+    .full {
+      width: 100%;
+      margin-top: 15px;
+    }
+
+    .divider {
+      text-align: center;
+      color: #73819b;
+      font-size: 12px;
+      margin: 17px 0;
+    }
+
+    .status {
+      display: none;
+      margin-bottom: 15px;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .status.show {
+      display: block;
+    }
+
+    .status.error {
+      color: #ffd6dc;
+      background: #401e2a;
+      border: 1px solid #713346;
+    }
+
+    .status.success {
+      color: #baf7df;
+      background: #12362f;
+      border: 1px solid #226454;
+    }
+
+    .status.info {
+      color: #dce3ff;
+      background: #1b2845;
+      border: 1px solid #334878;
+    }
+
+    .room-info {
+      display: none;
+    }
+
+    .room-info.active {
+      display: block;
+    }
+
+    .room-name {
+      font-size: 19px;
+      font-weight: 750;
+      overflow-wrap: anywhere;
+    }
+
+    .room-id {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      overflow-wrap: anywhere;
+      line-height: 1.6;
+    }
+
+    .room-actions {
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 15px;
+    }
+
+    .room-actions button {
+      flex: 1;
+    }
+
+    .chat {
+      display: none;
+    }
+
+    .chat.active {
+      display: block;
+    }
+
+    .chat-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .chat-heading h2 {
+      margin: 0;
+    }
+
+    .live-label {
+      color: var(--success);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .messages {
+      height: 330px;
+      overflow-y: auto;
+      border-radius: 12px;
+      padding: 12px;
+      background: #090f1d;
+      border: 1px solid var(--border);
+    }
+
+    .empty {
+      text-align: center;
+      color: #8290aa;
+      font-size: 13px;
+      padding: 35px 10px;
+    }
+
+    .message {
+      border: 1px solid #293956;
+      background: #15213a;
+      border-radius: 11px;
+      padding: 11px;
+      margin-bottom: 10px;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+
+    .message:last-child {
+      margin-bottom: 0;
+    }
+
+    .message-time {
+      font-size: 10px;
+      color: #91a1bd;
+      margin-bottom: 5px;
+    }
+
+    .message-body {
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .send-row {
+      display: flex;
+      gap: 9px;
+      margin-top: 12px;
+    }
+
+    .send-row input {
+      flex: 1;
+    }
+
+    .send-row button {
+      align-self: stretch;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+      margin: 12px 0 0;
+    }
+
+    footer {
+      text-align: center;
+      color: #71809a;
+      font-size: 12px;
+      padding: 10px;
+    }
+
+    @media (max-width: 430px) {
+      .app {
+        padding: 12px 11px 25px;
+      }
+
+      .card {
+        padding: 15px;
+      }
+
+      .field-row {
+        flex-direction: column;
+      }
+
+      .field-row button {
+        width: 100%;
+      }
+
+      .messages {
+        height: 300px;
+      }
+
+      h1 {
+        font-size: 27px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <header>
+      <div class="logo">N</div>
+      <h1>NovaChat</h1>
+      <p>Create a private room or join one with a Room ID.</p>
+    </header>
+
+    <div id="status" class="status" role="status" aria-live="polite"></div>
+
+    <section id="setup" class="card">
+      <h2>Create a new room</h2>
+
+      <form id="createForm">
+        <label for="newRoomName">Room name</label>
+        <input
+          id="newRoomName"
+          type="text"
+          maxlength="80"
+          placeholder="Enter room name"
+          required
+        >
+
+        <label for="newRoomPassword">Room password</label>
+        <input
+          id="newRoomPassword"
+          type="password"
+          minlength="1"
+          maxlength="200"
+          placeholder="Create a room password"
+          required
+        >
+
+        <button id="createBtn" class="primary full" type="submit">
+          Create Room
+        </button>
+      </form>
+
+      <div class="divider">— OR JOIN AN EXISTING ROOM —</div>
+
+      <form id="joinForm">
+        <label for="joinRoomId">Room ID</label>
+        <input
+          id="joinRoomId"
+          type="text"
+          placeholder="Paste the Room ID"
+          required
+        >
+
+        <label for="joinRoomPassword">Room password</label>
+        <input
+          id="joinRoomPassword"
+          type="password"
+          placeholder="Enter room password"
+          required
+        >
+
+        <button id="joinBtn" class="secondary full" type="submit">
+          Join Room
+        </button>
+      </form>
+    </section>
+
+    <section id="roomInfo" class="card room-info">
+      <div class="room-name" id="roomNameDisplay">My Room</div>
+      <div class="room-id">
+        Room ID: <span id="roomIdDisplay"></span>
+      </div>
+
+      <div class="room-actions">
+        <button id="copyBtn" class="secondary" type="button">
+          Copy Room ID
+        </button>
+        <button id="leaveBtn" class="danger" type="button">
+          Leave Room
+        </button>
+      </div>
+    </section>
+
+    <section id="chat" class="card chat">
+      <div class="chat-heading">
+        <h2>Messages</h2>
+        <span class="live-label" id="liveLabel">● Connected</span>
+      </div>
+
+      <div id="messages" class="messages" aria-live="polite">
+        <div class="empty">Loading messages...</div>
+      </div>
+
+      <form id="sendForm" class="send-row">
+        <input
+          id="messageInput"
+          type="text"
+          maxlength="10000"
+          placeholder="Write a message..."
+          autocomplete="off"
+          required
+        >
+        <button id="sendBtn" class="primary" type="submit">
+          Send
+        </button>
+      </form>
+
+      <p class="hint">
+        Anyone who has the Room ID and password may be able to join this room.
+        Do not share sensitive personal information here.
+      </p>
+    </section>
+
+    <footer>NovaChat · Simple room-based chat</footer>
+  </main>
+
+  <script>
+    "use strict";
+
+    // Supabase project settings
+    const PROJECT_URL =
+      "https://genmchelqoewebprqrys.supabase.co";
+
+    const PUBLISHABLE_KEY =
+      "sb_publishable_0CxBMuW0vhX1rWk3o-RZcg_uOmdW2RE";
+
+    const API_URL =
+      "https://genmchelqoewebprqrys.supabase.co/functions/v1/clever-function";
+
+    const POLL_INTERVAL = 3000;
+
+    let currentRoomId = null;
+    let currentRoomName = "";
+    let currentToken = null;
+    let pollTimer = null;
+    let isLoadingMessages = false;
+    let isSending = false;
+    let lastMessageSignature = "";
+
+    const $ = (id) => document.getElementById(id);
+
+    function showStatus(message, type = "info") {
+      const el = $("status");
+      el.textContent = message;
+      el.className = "status show " + type;
+    }
+
+    function clearStatus() {
+      $("status").textContent = "";
+      $("status").className = "status";
+    }
+
+    function setBusy(button, busy, busyText, normalText) {
+      button.disabled = busy;
+      button.textContent = busy ? busyText : normalText;
+    }
+
+    async function apiRequest(payload) {
+      const headers = {
+        "Content-Type": "application/json",
+        "apikey": PUBLISHABLE_KEY,
+        "Authorization": "Bearer " + PUBLISHABLE_KEY
+      };
+
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(payload)
+      });
+
+      const raw = await response.text();
+      let result;
+
+      try {
+        result = raw ? JSON.parse(raw) : {};
+      } catch {
+        throw new Error(
+          "Server returned an unexpected response (HTTP " +
+          response.status + ")."
+        );
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          result.error ||
+          result.message ||
+          ("Request failed (HTTP " + response.status + ").")
+        );
+      }
+
+      if (result.error && !(result.ok || result.success)) {
+        throw new Error(result.error);
+      }
+
+      return result;
+    }
+
+    // Backend currently returns { ok: true }, so accept both formats.
+    function isSuccessful(result) {
+      return Boolean(result && (result.ok === true ||
+                                result.success === true));
+    }
+
+    function showRoom(roomId, roomName, token) {
+      currentRoomId = roomId;
+      currentRoomName = roomName || "Chat Room";
+      currentToken = token;
+
+      $("roomNameDisplay").textContent = currentRoomName;
+      $("roomIdDisplay").textContent = currentRoomId;
+
+      $("setup").style.display = "none";
+      $("roomInfo").classList.add("active");
+      $("chat").classList.add("active");
+
+      $("messages").replaceChildren();
+      const loading = document.createElement("div");
+      loading.className = "empty";
+      loading.textContent = "Loading messages...";
+      $("messages").appendChild(loading);
+
+      lastMessageSignature = "";
+      clearStatus();
+
+      startPolling();
+      loadMessages();
+    }
+
+    async function createRoom(event) {
+      event.preventDefault();
+
+      const roomName = $("newRoomName").value.trim();
+      const password = $("newRoomPassword").value;
+
+      if (!roomName || !password) {
+        showStatus("Enter a room name and password.", "error");
+        return;
+      }
+
+      const btn = $("createBtn");
+      setBusy(btn, true, "Creating...", "Create Room");
+
+      try {
+        const result = await apiRequest({
+          action: "create",
+          roomName,
+          password
+        });
+
+        const roomId = result.roomId || result.room_id;
+        const token = result.token;
+        const name = result.roomName || result.room_name || roomName;
+
+        if (!isSuccessful(result) || !roomId || !token) {
+          throw new Error(
+            result.error || "Room creation response is incomplete."
+          );
+        }
+
+        $("newRoomPassword").value = "";
+        showRoom(roomId, name, token);
+        showStatus("Room created successfully!", "success");
+      } catch (error) {
+        showStatus("Create failed: " + error.message, "error");
+      } finally {
+        setBusy(btn, false, "Creating...", "Create Room");
+      }
+    }
+
+    async function joinRoom(event) {
+      event.preventDefault();
+
+      const roomId = $("joinRoomId").value.trim();
+      const password = $("joinRoomPassword").value;
+
+      if (!roomId || !password) {
+        showStatus("Enter the Room ID and password.", "error");
+        return;
+      }
+
+      const btn = $("joinBtn");
+      setBusy(btn, true, "Joining...", "Join Room");
+
+      try {
+        const result = await apiRequest({
+          action: "join",
+          roomId,
+          password
+        });
+
+        const token = result.token;
+        const returnedRoomId = result.roomId || result.room_id || roomId;
+        const name = result.roomName || result.room_name || "Chat Room";
+
+        if (!isSuccessful(result) || !token) {
+          throw new Error(result.error || "Could not join this room.");
+        }
+
+        $("joinRoomPassword").value = "";
+        showRoom(returnedRoomId, name, token);
+        showStatus("Joined room successfully!", "success");
+      } catch (error) {
+        showStatus("Join failed: " + error.message, "error");
+      } finally {
+        setBusy(btn, false, "Joining...", "Join Room");
+      }
+    }
+
+    async function loadMessages() {
+      if (!currentToken || isLoadingMessages) return;
+
+      isLoadingMessages = true;
+
+      try {
+        const result = await apiRequest({
+          action: "list",
+          token: currentToken
+        });
+
+        if (!isSuccessful(result) ||
+            !Array.isArray(result.messages)) {
+          throw new Error(result.error || "Could not load messages.");
+        }
+
+        if (result.roomName || result.room_name) {
+          currentRoomName = result.roomName || result.room_name;
+          $("roomNameDisplay").textContent = currentRoomName;
+        }
+
+        renderMessages(result.messages);
+        $("liveLabel").textContent = "● Connected";
+      } catch (error) {
+        $("liveLabel").textContent = "● Reconnecting";
+        console.error("Load messages:", error);
+
+        // Invalid or expired sessions should not poll forever.
+        if (/session|expired|unauthori[sz]ed|invalid token/i.test(
+          error.message
+        )) {
+          stopPolling();
+          showStatus(
+            "Your room session may have expired. Please join again.",
+            "error"
+          );
+        }
+      } finally {
+        isLoadingMessages = false;
+      }
+    }
+
+    function renderMessages(messages) {
+      const container = $("messages");
+
+      const signature = JSON.stringify(
+        messages.map((m) => [
+          m.id ?? "",
+          m.created_at ?? "",
+          m.message ?? ""
+        ])
+      );
+
+      if (signature === lastMessageSignature) return;
+
+      const wasNearBottom =
+        container.scrollHeight - container.scrollTop -
+        container.clientHeight < 70;
+
+      container.replaceChildren();
+
+      if (messages.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "No messages yet. Say hello!";
+        container.appendChild(empty);
+      } else {
+        for (const item of messages) {
+          const card = document.createElement("div");
+          card.className = "message";
+
+          const time = document.createElement("div");
+          time.className = "message-time";
+
+          if (item.created_at) {
+            const date = new Date(item.created_at);
+            time.textContent = Number.isNaN(date.getTime())
+              ? ""
+              : date.toLocaleString();
+          } else {
+            time.textContent = "";
+          }
+
+          const body = document.createElement("div");
+          body.className = "message-body";
+          body.textContent = String(item.message ?? "");
+
+          card.append(time, body);
+          container.appendChild(card);
+        }
+      }
+
+      lastMessageSignature = signature;
+
+      if (wasNearBottom) {
+        container.scrollTop = container.scrollHeight;
+      }
+    }
+
+    async function sendMessage(event) {
+      event.preventDefault();
+
+      if (!currentToken || isSending) return;
+
+      const input = $("messageInput");
+      const message = input.value.trim();
+
+      if (!message) return;
+
+      const btn = $("sendBtn");
+      isSending = true;
+      setBusy(btn, true, "Sending...", "Send");
+
+      try {
+        const result = await apiRequest({
+          action: "send",
+          token: currentToken,
+          message
+        });
+
+        if (!isSuccessful(result)) {
+          throw new Error(result.error || "Message could not be sent.");
+        }
+
+        input.value = "";
+        await loadMessages();
+        input.focus();
+      } catch (error) {
+        showStatus("Send failed: " + error.message, "error");
+      } finally {
+        isSending = false;
+        setBusy(btn, false, "Sending...", "Send");
+      }
+    }
+
+    function startPolling() {
+      stopPolling();
+      pollTimer = setInterval(() => {
+        loadMessages();
+      }, POLL_INTERVAL);
+    }
+
+    function stopPolling() {
+      if (pollTimer !== null) {
+        clearInterval(pollTimer);
+        pollTimer = null;
+      }
+    }
+
+    async function copyRoomId() {
+      if (!currentRoomId) return;
+
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(currentRoomId);
+        } else {
+          const temp = document.createElement("textarea");
+          temp.value = currentRoomId;
+          temp.style.position = "fixed";
+          temp.style.opacity = "0";
+          document.body.appendChild(temp);
+          temp.select();
+
+          const copied = document.execCommand("copy");
+          temp.remove();
+
+          if (!copied) {
+            throw new Error("Clipboard access is unavailable.");
+          }
+        }
+
+        showStatus("Room ID copied!", "success");
+      } catch (error) {
+        showStatus(
+          "Copy failed. Press and hold the Room ID to copy it manually.",
+          "error"
+        );
+      }
+    }
+
+    function leaveRoom() {
+      stopPolling();
+
+      currentRoomId = null;
+      currentRoomName = "";
+      currentToken = null;
+      lastMessageSignature = "";
+      isLoadingMessages = false;
+
+      $("roomInfo").classList.remove("active");
+      $("chat").classList.remove("active");
+      $("setup").style.display = "block";
+
+      $("messages").replaceChildren();
+      $("messageInput").value = "";
+
+      clearStatus();
+      showStatus("You left the room on this device.", "info");
+    }
+
+    $("createForm").addEventListener("submit", createRoom);
+    $("joinForm").addEventListener("submit", joinRoom);
+    $("sendForm").addEventListener("submit", sendMessage);
+    $("copyBtn").addEventListener("click", copyRoomId);
+    $("leaveBtn").addEventListener("click", leaveRoom);
+
+    // Do not save the room session token in localStorage.
+    window.addEventListener("pagehide", stopPolling);
+  </script>
+</body>
+</html>
